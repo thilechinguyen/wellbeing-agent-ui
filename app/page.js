@@ -17,7 +17,6 @@ export default function Home() {
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     "https://wellbeingagent.onrender.com/chat";
 
-  // Handle send message
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -38,7 +37,7 @@ export default function Home() {
         body: JSON.stringify({
           user_id: "demo-user",
           message: userMessage,
-          ...studentProfile, // NEW: send profile to backend
+          ...studentProfile, // gửi profile lên backend
         }),
       });
 
@@ -52,7 +51,10 @@ export default function Home() {
       console.error(err);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Lỗi kết nối server." },
+        {
+          role: "assistant",
+          content: "Lỗi kết nối server hoặc backend không phản hồi.",
+        },
       ]);
     } finally {
       setLoading(false);
@@ -60,19 +62,39 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0c0f1a] text-white flex flex-col items-center p-6">
-
-      <h1 className="text-3xl font-bold mb-4">
-        Wellbeing Companion (v2.0)
+    <main
+      style={{
+        minHeight: "100vh",
+        background: "#050816",
+        color: "white",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: "24px",
+        gap: "16px",
+      }}
+    >
+      <h1 style={{ fontSize: "28px", fontWeight: "bold" }}>
+        Wellbeing Companion <span style={{ color: "#60a5fa" }}>v2.0 – Profiles</span>
       </h1>
 
-      {/* 🔥 NEW: Dropdown chọn student profile */}
-      <div className="bg-[#1a1f2e] p-4 rounded-xl w-full max-w-xl mb-4 shadow-lg">
-        <h2 className="font-semibold text-lg mb-2">Student Profile</h2>
+      {/* Hộp chọn Student Profile */}
+      <div
+        style={{
+          background: "#111827",
+          padding: "16px",
+          borderRadius: "12px",
+          width: "100%",
+          maxWidth: "640px",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+        }}
+      >
+        <h2 style={{ fontSize: "18px", fontWeight: 600, marginBottom: "8px" }}>
+          Student Profile (sent to multi-agent backend)
+        </h2>
 
-        <label className="block text-sm mb-1">Student Type</label>
+        <label style={{ fontSize: "14px" }}>Student type</label>
         <select
-          className="w-full mb-3 p-2 rounded bg-[#0c0f1a] border border-gray-600"
           value={studentProfile.student_type}
           onChange={(e) =>
             setStudentProfile((prev) => ({
@@ -80,14 +102,23 @@ export default function Home() {
               student_type: e.target.value,
             }))
           }
+          style={{
+            width: "100%",
+            marginTop: "4px",
+            marginBottom: "12px",
+            padding: "8px",
+            borderRadius: "8px",
+            border: "1px solid #374151",
+            background: "#020617",
+            color: "white",
+          }}
         >
           <option value="domestic">Domestic (Australia)</option>
           <option value="international">International</option>
         </select>
 
-        <label className="block text-sm mb-1">Region</label>
+        <label style={{ fontSize: "14px" }}>Region</label>
         <select
-          className="w-full p-2 rounded bg-[#0c0f1a] border border-gray-600"
           value={studentProfile.student_region}
           onChange={(e) =>
             setStudentProfile((prev) => ({
@@ -95,47 +126,119 @@ export default function Home() {
               student_region: e.target.value,
             }))
           }
+          style={{
+            width: "100%",
+            marginTop: "4px",
+            padding: "8px",
+            borderRadius: "8px",
+            border: "1px solid #374151",
+            background: "#020617",
+            color: "white",
+          }}
         >
           <option value="au">🇦🇺 Australia</option>
-          <option value="se_asia">🌏 SE Asia</option>
+          <option value="se_asia">🌏 South-East Asia</option>
           <option value="europe">🇪🇺 Europe</option>
-          <option value="other">🌍 Other Regions</option>
+          <option value="other">🌍 Other regions</option>
         </select>
+
+        <p style={{ fontSize: "12px", marginTop: "8px", color: "#9ca3af" }}>
+          Các lựa chọn này được gửi kèm trong body request tới backend
+          (fields: <code>student_type</code>, <code>student_region</code>).
+        </p>
       </div>
 
-      {/* Chat UI */}
-      <div className="w-full max-w-xl bg-[#1a1f2e] p-4 rounded-xl mb-4 h-[60vh] overflow-y-auto shadow-lg">
-        {messages.map((m, i) => (
+      {/* Khung chat */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "640px",
+          background: "#111827",
+          padding: "16px",
+          borderRadius: "12px",
+          height: "55vh",
+          overflowY: "auto",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.4)",
+        }}
+      >
+        {messages.length === 0 && (
+          <p style={{ color: "#9ca3af", fontSize: "14px" }}>
+            Bắt đầu bằng cách chia sẻ một điều khiến bạn lo lắng, buồn, stress
+            hoặc thấy cô đơn. Chatbot sẽ phản hồi dựa trên multi-agent wellbeing
+            backend (v0.7).
+          </p>
+        )}
+
+        {messages.map((m, idx) => (
           <div
-            key={i}
-            className={`mb-3 p-3 rounded-lg ${
-              m.role === "user"
-                ? "bg-blue-600 text-white self-end"
-                : "bg-gray-700 text-white"
-            }`}
+            key={idx}
+            style={{
+              marginBottom: "10px",
+              display: "flex",
+              justifyContent: m.role === "user" ? "flex-end" : "flex-start",
+            }}
           >
-            {m.content}
+            <div
+              style={{
+                maxWidth: "80%",
+                padding: "10px 12px",
+                borderRadius: "12px",
+                background: m.role === "user" ? "#2563eb" : "#374151",
+                whiteSpace: "pre-wrap",
+                fontSize: "14px",
+              }}
+            >
+              {m.content}
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Input box */}
-      <div className="w-full max-w-xl flex gap-2">
+      {/* Ô nhập */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "640px",
+          display: "flex",
+          gap: "8px",
+        }}
+      >
         <input
-          className="flex-1 p-3 rounded bg-[#1a1f2e] border border-gray-700 focus:outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Nhập tin nhắn..."
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          }}
+          placeholder="Nhập điều bạn đang lo lắng hoặc muốn chia sẻ..."
+          style={{
+            flex: 1,
+            padding: "10px 12px",
+            borderRadius: "999px",
+            border: "1px solid #374151",
+            background: "#020617",
+            color: "white",
+            fontSize: "14px",
+          }}
         />
         <button
           onClick={sendMessage}
           disabled={loading}
-          className="px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl"
+          style={{
+            padding: "10px 18px",
+            borderRadius: "999px",
+            border: "none",
+            background: loading ? "#4b5563" : "#2563eb",
+            color: "white",
+            fontWeight: 600,
+            cursor: loading ? "default" : "pointer",
+          }}
         >
           {loading ? "..." : "Gửi"}
         </button>
       </div>
-
     </main>
   );
 }

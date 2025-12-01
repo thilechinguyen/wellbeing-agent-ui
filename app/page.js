@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ExportButtons } from "../components/ExportButtons";
 
 const SUGGESTIONS = {
   vi: [
@@ -362,6 +363,18 @@ export default function Home() {
         >
           {loading ? "..." : "Gửi"}
         </button>
+      </div>
+
+      {/* Nút export CSV + Wellbeing Reports */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "960px",
+          marginTop: "8px",
+          alignSelf: "center",
+        }}
+      >
+        <ExportButtons />
       </div>
     </main>
   );

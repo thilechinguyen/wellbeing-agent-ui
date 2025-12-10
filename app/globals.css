@@ -1,5 +1,6 @@
-/* app/globals.css – version không dùng Tailwind */
+/* app/globals.css – UI dark mode hiện đại cho Wellbeing Companion */
 
+/* Reset & base styles */
 *,
 *::before,
 *::after {
@@ -15,10 +16,337 @@ body {
 body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  background-color: #050816;
-  color: #ffffff;
+  background: radial-gradient(circle at top, #0b1220 0, #020617 55%, #000 100%);
+  color: #f9fafb;
 }
 
+/* Remove default button styling */
 button {
   font-family: inherit;
+}
+
+/* -------- Layout shell -------- */
+
+.page-shell {
+  min-height: 100vh;
+}
+
+.page-container {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2.75rem 1.5rem 3.5rem;
+}
+
+/* Header */
+
+.page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.page-subtitle {
+  font-size: 0.95rem;
+  color: #9ca3af;
+  max-width: 42rem;
+}
+
+/* Language pill */
+
+.language-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.8rem;
+}
+
+.language-select {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  outline: none;
+  padding-left: 0.25rem;
+  cursor: pointer;
+}
+
+/* -------- Grid layout -------- */
+
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr);
+  gap: 1.75rem;
+}
+
+@media (min-width: 1024px) {
+  .page-grid {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr);
+  }
+}
+
+.page-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* -------- Cards / sections -------- */
+
+.section-card {
+  background: rgba(15, 23, 42, 0.96);
+  border-radius: 1rem;
+  padding: 1.4rem 1.5rem 1.3rem;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.7);
+}
+
+.section-card + .section-card {
+  margin-top: 0.25rem;
+}
+
+.section-title {
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  margin-bottom: 0.6rem;
+}
+
+/* Form fields */
+
+.field-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #e5e7eb;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.field-control {
+  width: 100%;
+  margin-top: 0.3rem;
+  margin-bottom: 0.55rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.65rem;
+  border: 1px solid #4b5563;
+  background: #020617;
+  color: #f9fafb;
+  font-size: 0.9rem;
+}
+
+.field-control:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.7);
+}
+
+.field-help {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 0.15rem;
+}
+
+/* Quick prompts chips */
+
+.prompt-chips {
+  margin-top: 0.5rem;
+}
+
+.prompt-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(75, 85, 99, 0.9);
+  background: rgba(15, 23, 42, 0.92);
+  color: #e5e7eb;
+  font-size: 0.8rem;
+  margin: 0.18rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    transform 0.1s ease, box-shadow 0.15s ease;
+  white-space: nowrap;
+}
+
+.prompt-chip:hover {
+  background: #2563eb;
+  border-color: #60a5fa;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.65);
+  transform: translateY(-1px);
+}
+
+/* -------- Chat area -------- */
+
+.chat-card-header {
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.4rem;
+}
+
+.chat-card-subtext {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 0.7rem;
+}
+
+.messages-panel {
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: 0.1rem;
+  margin-bottom: 0.75rem;
+}
+
+.messages-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.messages-panel::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 999px;
+}
+
+.message-empty {
+  font-size: 0.86rem;
+  color: #9ca3af;
+  padding: 0.75rem 0.4rem;
+}
+
+/* Message bubbles */
+
+.message-row {
+  display: flex;
+  margin-bottom: 0.5rem;
+}
+
+.message-row--user {
+  justify-content: flex-end;
+}
+
+.message-row--assistant {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  max-width: 85%;
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.9rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.message-bubble--user {
+  background: linear-gradient(to right, #3b82f6, #22c55e);
+  color: #f9fafb;
+  border-bottom-right-radius: 0.2rem;
+}
+
+.message-bubble--assistant {
+  background: #020617;
+  border: 1px solid #374151;
+  color: #e5e7eb;
+  border-bottom-left-radius: 0.2rem;
+}
+
+/* Input row */
+
+.chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.25rem;
+}
+
+.message-input {
+  flex: 1;
+  min-height: 60px;
+  max-height: 120px;
+  resize: vertical;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.8rem;
+  border: 1px solid #4b5563;
+  background: #020617;
+  color: #f9fafb;
+  font-size: 0.9rem;
+}
+
+.message-input:focus {
+  outline: none;
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.7);
+}
+
+/* Primary button */
+
+.primary-button {
+  padding: 0.55rem 1.35rem;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(to right, #3b82f6, #22c55e);
+  color: white;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.7);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, filter 0.15s ease;
+  white-space: nowrap;
+}
+
+.primary-button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 15px 32px rgba(37, 99, 235, 0.9);
+}
+
+.primary-button:disabled {
+  opacity: 0.65;
+  cursor: default;
+  box-shadow: none;
+  filter: none;
+}
+
+/* Export buttons footer */
+
+.export-footer {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.export-footer button {
+  font-size: 0.8rem;
+}
+
+/* Utility */
+
+.text-sm-muted {
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 0.3rem;
 }

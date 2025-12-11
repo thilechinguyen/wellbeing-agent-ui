@@ -144,10 +144,10 @@ export default function Home() {
     student_region: "au",
   });
 
-  // Base URL backend (không kèm /chat)
-  const BACKEND_BASE =
+  // ✅ Backend thật: FastAPI trên Render, route POST /chat
+  const backendURL =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://wellbeingagent.onrender.com";
+    "https://wellbeingagent.onrender.com/chat";
 
   const currentSuggestions = SUGGESTIONS[language] || SUGGESTIONS.vi;
   const t = STRINGS[language] || STRINGS.vi;
@@ -174,10 +174,7 @@ export default function Home() {
         message: metaPrefix + userMessage,
       };
 
-      const url = `${BACKEND_BASE}/chat`;
-      console.log("Calling backend:", url, payload);
-
-      const res = await fetch(url, {
+      const res = await fetch(backendURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

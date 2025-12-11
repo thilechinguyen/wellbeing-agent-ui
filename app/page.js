@@ -144,9 +144,10 @@ export default function Home() {
     student_region: "au",
   });
 
+  // Base URL backend (không kèm /chat)
   const backendURL =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://wellbeingagent.onrender.com/chat";
+    "https://wellbeingagent.onrender.com";
 
   const currentSuggestions = SUGGESTIONS[language] || SUGGESTIONS.vi;
   const t = STRINGS[language] || STRINGS.vi;
@@ -173,7 +174,7 @@ export default function Home() {
         message: metaPrefix + userMessage,
       };
 
-      const res = await fetch(backendURL, {
+      const res = await fetch(`${backendURL}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

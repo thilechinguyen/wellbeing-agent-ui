@@ -145,7 +145,7 @@ export default function Home() {
   });
 
   // Base URL backend (không kèm /chat)
-  const backendURL =
+  const BACKEND_BASE =
     process.env.NEXT_PUBLIC_BACKEND_URL ||
     "https://wellbeingagent.onrender.com";
 
@@ -174,7 +174,10 @@ export default function Home() {
         message: metaPrefix + userMessage,
       };
 
-      const res = await fetch(`${backendURL}/chat`, {
+      const url = `${BACKEND_BASE}/chat`;
+      console.log("Calling backend:", url, payload);
+
+      const res = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

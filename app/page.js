@@ -146,7 +146,7 @@ export default function Home() {
 
   // ✅ Chắc cú: luôn gọi đúng /chat
   const rawBackend =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "https://wellbeingagent.onrender.com";
+    process.env.NEXT_PUBLIC_BACKEND_URL || "https://wellbeingagent.onrender.com/chat";
   const backendURL = rawBackend.replace(/\/$/, "") + "/chat";
 
   // Debug nhanh (mở console browser để nhìn)
@@ -174,7 +174,7 @@ export default function Home() {
       const metaPrefix = `[lang=${language};profile_type=${studentProfile.student_type};profile_region=${studentProfile.student_region}] `;
 
       const payload = {
-        user_id: "demo-user",
+        student_id: "demo-user",
         message: metaPrefix + userMessage,
       };
 

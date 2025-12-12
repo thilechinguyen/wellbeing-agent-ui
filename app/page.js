@@ -144,10 +144,14 @@ export default function Home() {
     student_region: "au",
   });
 
-  // ✅ Backend thật: FastAPI trên Render, route POST /chat
-  const backendURL =
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    "https://wellbeingagent.onrender.com/chat";
+  // ✅ Chắc cú: luôn gọi đúng /chat
+  const rawBackend =
+    process.env.NEXT_PUBLIC_BACKEND_URL || "https://wellbeingagent.onrender.com";
+  const backendURL = rawBackend.replace(/\/$/, "") + "/chat";
+
+  // Debug nhanh (mở console browser để nhìn)
+  // eslint-disable-next-line no-console
+  console.log("Backend URL UI is using:", backendURL);
 
   const currentSuggestions = SUGGESTIONS[language] || SUGGESTIONS.vi;
   const t = STRINGS[language] || STRINGS.vi;
@@ -157,7 +161,7 @@ export default function Home() {
   };
 
   const sendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
     setInput("");
@@ -176,15 +180,14 @@ export default function Home() {
 
       const res = await fetch(backendURL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
+        // eslint-disable-next-line no-console
         console.error("Backend error status:", res.status);
-        throw new Error("Backend returned non-200");
+        throw new Error(`Backend returned ${res.status}`);
       }
 
       const data = await res.json();
@@ -197,7 +200,9 @@ export default function Home() {
         },
       ]);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error calling backend:", err);
+
       setMessages((prev) => [
         ...prev,
         {
@@ -213,9 +218,7 @@ export default function Home() {
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      if (!loading) {
-        sendMessage();
-      }
+      sendMessage();
     }
   };
 
@@ -336,9 +339,7 @@ export default function Home() {
                     key={idx}
                     className={`message-row message-row--${m.role}`}
                   >
-                    <div
-                      className={`message-bubble message-bubble--${m.role}`}
-                    >
+                    <div className={`message-bubble message-bubble--${m.role}`}>
                       {m.content}
                     </div>
                   </div>

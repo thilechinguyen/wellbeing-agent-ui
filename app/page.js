@@ -130,23 +130,77 @@ const STRINGS = {
   },
 };
 
+/**
+ * Build backend URL safely
+ * Env should be BASE (no /chat), e.g. https://wellbeingagent.onrender.com
+ */
 function buildBackendUrl() {
-  // ENV phải là base URL, ví dụ: https://wellbeingagent.onrender.com
   const envBase = process.env.NEXT_PUBLIC_BACKEND_URL;
-
-  // Default base URL (KHÔNG kèm /chat)
   const fallbackBase = "https://wellbeingagent.onrender.com";
 
-  // Chọn base
-  let base = (envBase && envBase.trim()) ? envBase.trim() : fallbackBase;
+  let base = envBase && envBase.trim() ? envBase.trim() : fallbackBase;
 
-  // Nếu ai đó lỡ set env có /chat, mình gỡ luôn để tránh /chat/chat
+  // If someone accidentally set .../chat, strip it
   base = base.replace(/\/chat\/?$/i, "");
-
-  // normalize: bỏ dấu / cuối
+  // Remove trailing slash
   base = base.replace(/\/$/, "");
 
   return `${base}/chat`;
+}
+
+/**
+ * fetch with timeout using AbortController (Safari-safe)
+ */
+async function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(id);
+  }
+}
+
+/**
+ * fetch with timeout + retry (for Safari / transient network)
+ */
+async function fetchWithTimeoutAndRetry(
+  url,
+  options = {},
+  { timeoutMs = 20000, retries = 1, retryDelayMs = 1200 } = {}
+) {
+  let lastErr;
+
+  for (let attempt = 0; attempt <= retries; attempt += 1) {
+    try {
+      return await fetchWithTimeout(url, options, timeoutMs);
+    } catch (err) {
+      lastErr = err;
+
+      // AbortError means timeout hit
+      const isAbort =
+        (err && err.name === "AbortError") ||
+        String(err?.message || "").toLowerCase().includes("abort");
+
+      // eslint-disable-next-line no-console
+      console.warn(
+        `fetch attempt ${attempt + 1}/${retries + 1} failed`,
+        isAbort ? "(timeout)" : "",
+        err
+      );
+
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, retryDelayMs));
+        continue;
+      }
+    }
+  }
+
+  throw lastErr;
 }
 
 export default function Home() {
@@ -154,7 +208,7 @@ export default function Home() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Ngôn ngữ giao diện
+  // UI language
   const [language, setLanguage] = useState("vi");
 
   // Student Profile
@@ -175,9 +229,6 @@ export default function Home() {
   };
 
   const sendMessage = async () => {
-    // eslint-disable-next-line no-console
-    console.log("sendMessage() called");
-
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
@@ -188,7 +239,7 @@ export default function Home() {
     setLoading(true);
 
     try {
-      // history gửi cho backend (nếu orchestrator cần)
+      // Ensure history includes latest user message
       const history = [...messages, { role: "user", content: userMessage }];
 
       const payload = {
@@ -200,24 +251,27 @@ export default function Home() {
           student_type: studentProfile.student_type,
           region: studentProfile.student_region,
         },
-        // vẫn gửi thêm dạng “cũ” để tương thích orchestrator nếu bạn dùng profile_type/profile_region
+        // backward compatibility fields
         profile_type: studentProfile.student_type,
         profile_region: studentProfile.student_region,
       };
 
-      // eslint-disable-next-line no-console
-      console.log("Payload:", payload);
-
-      const res = await fetch(backendURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetchWithTimeoutAndRetry(
+        backendURL,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        },
+        {
+          timeoutMs: 25000, // allow LLM latency
+          retries: 1, // retry once
+          retryDelayMs: 1500,
+        }
+      );
 
       if (!res.ok) {
         const text = await res.text().catch(() => "");
-        // eslint-disable-next-line no-console
-        console.error("Backend error status:", res.status, text);
         throw new Error(`Backend returned ${res.status} ${text}`);
       }
 
@@ -240,7 +294,9 @@ export default function Home() {
           role: "assistant",
           content:
             t.backendError +
-            `\n\n[Debug]\n${String(err?.message || err)}`,
+            `\n\n[Debug]\n${String(err?.name || "")} ${String(
+              err?.message || err
+            )}`.trim(),
         },
       ]);
     } finally {
@@ -281,9 +337,9 @@ export default function Home() {
           </div>
         </header>
 
-        {/* 2 cột */}
+        {/* 2 columns */}
         <div className="page-grid">
-          {/* Cột trái */}
+          {/* Left column */}
           <div className="page-column">
             {/* Student profile */}
             <section className="section-card">
@@ -305,7 +361,9 @@ export default function Home() {
                   }
                 >
                   <option value="domestic">{t.studentTypeDomestic}</option>
-                  <option value="international">{t.studentTypeInternational}</option>
+                  <option value="international">
+                    {t.studentTypeInternational}
+                  </option>
                 </select>
               </div>
 
@@ -354,7 +412,7 @@ export default function Home() {
             </section>
           </div>
 
-          {/* Cột phải: Chat */}
+          {/* Right column: Chat */}
           <div className="page-column">
             <section className="section-card">
               <div className="chat-card-header">{t.shareHeader}</div>

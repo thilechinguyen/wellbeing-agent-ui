@@ -24,16 +24,13 @@ const SUGGESTIONS = {
   ],
 };
 
-/**
- * Toàn bộ text giao diện cho từng ngôn ngữ
- */
 const STRINGS = {
   vi: {
     langPillLabel: "Ngôn ngữ",
-    title: "Wellbeing Companion v2.1 – Multi-profile",
+    title: "Wellbeing Companion v2.2 – Multi-profile",
     subtitle:
       "Chatbot wellbeing dựa trên CBT dành cho sinh viên năm nhất. Multi-agent backend + research logging.",
-    profileTitle: "Student Profile (gửi kèm metadata trong message)",
+    profileTitle: "Student Profile (gửi kèm metadata trong request)",
     studentTypeLabel: "Student type",
     studentTypeDomestic: "Sinh viên trong nước (Úc)",
     studentTypeInternational: "Sinh viên quốc tế",
@@ -45,8 +42,7 @@ const STRINGS = {
     profileHelp:
       "Thông tin này giúp chatbot hiểu hoàn cảnh của bạn để đưa ra phản hồi phù hợp và mang tính hỗ trợ hơn.",
     quickTitle: "Quick prompts / Gợi ý câu bắt đầu",
-    quickHelp:
-      "Click để điền nhanh, sau đó bạn có thể chỉnh lại rồi bấm Gửi.",
+    quickHelp: "Click để điền nhanh, sau đó bạn có thể chỉnh lại rồi bấm Gửi.",
     emptyMessage:
       "Chưa có cuộc trò chuyện nào trong phiên này. Hãy thử kể một điều vừa xảy ra với bạn gần đây.",
     inputPlaceholder:
@@ -64,10 +60,10 @@ const STRINGS = {
   },
   en: {
     langPillLabel: "Language",
-    title: "Wellbeing Companion v2.1 – Multi-profile",
+    title: "Wellbeing Companion v2.2 – Multi-profile",
     subtitle:
       "CBT-based wellbeing chatbot for first-year students. Multi-agent backend + research logging.",
-    profileTitle: "Student Profile (sent as metadata in the message)",
+    profileTitle: "Student Profile (sent as metadata in the request)",
     studentTypeLabel: "Student type",
     studentTypeDomestic: "Domestic student (Australia)",
     studentTypeInternational: "International student",
@@ -77,16 +73,15 @@ const STRINGS = {
     shareSubtext:
       "You can type in English, Vietnamese, or mix languages – whatever feels most comfortable for you.",
     profileHelp:
-      "This information helps the chatbot understand your situation and offer more supportive responses.",
+      "This helps the chatbot understand your context and give more supportive responses.",
     quickTitle: "Quick prompts / Suggested ways to start",
-    quickHelp:
-      "Click to fill the message box quickly, then edit if needed and press Send.",
+    quickHelp: "Click to fill quickly, then edit and press Send.",
     emptyMessage:
-      "There is no conversation in this session yet. You can start by describing something that happened to you recently.",
+      "No messages in this session yet. You can start by describing something that happened recently.",
     inputPlaceholder:
-      "Type what you are going through... (Press Enter to send, Shift+Enter for a new line)",
+      "Type what you are going through... (Enter to send, Shift+Enter new line)",
     hintBelowInput:
-      "Tip: the language selector above only changes the UI and quick prompts. The chatbot can still understand and reply in multiple languages.",
+      "Tip: language selector changes UI only. The chatbot can still understand multiple languages.",
     sendButtonIdle: "Send",
     sendButtonLoading: "Sending...",
     backendError:
@@ -98,10 +93,10 @@ const STRINGS = {
   },
   zh: {
     langPillLabel: "语言",
-    title: "Wellbeing Companion v2.1 – 多档案",
+    title: "Wellbeing Companion v2.2 – 多档案",
     subtitle:
       "面向大一新生的 CBT 风格心理支持聊天机器人。多代理后台 + 研究日志记录。",
-    profileTitle: "学生档案（随消息一起发送的元数据）",
+    profileTitle: "学生档案（随请求发送的元数据）",
     studentTypeLabel: "学生类型",
     studentTypeDomestic: "本地学生（澳大利亚）",
     studentTypeInternational: "国际学生",
@@ -109,20 +104,17 @@ const STRINGS = {
     shareHeader: "说一件让你担心、难过、压力大或感到孤单的事情…",
     shareSubtext:
       "你可以用中文、英文、越南语或混合输入——只要你觉得舒服就好。",
-    profileHelp:
-      "这些信息能帮助聊天机器人更好地了解你的情况，并提供更贴心的回应。",
+    profileHelp: "这些信息能帮助聊天机器人更好理解你的情况并更贴心回应。",
     quickTitle: "Quick prompts / 开始聊天的小提示",
-    quickHelp: "点击即可快速填充输入框，然后可以修改后再发送。",
-    emptyMessage:
-      "本次会话中还没有消息，你可以从最近发生在你身上的一件事开始聊起。",
-    inputPlaceholder:
-      "输入你正在经历的事情……（按 Enter 发送，Shift+Enter 换行）",
+    quickHelp: "点击即可快速填充输入框，然后可修改后发送。",
+    emptyMessage: "本次会话还没有消息，你可以从最近的一件事开始聊起。",
+    inputPlaceholder: "输入你正在经历的事情……（Enter 发送，Shift+Enter 换行）",
     hintBelowInput:
-      "提示：上面的语言选择只会改变界面语言和提示语。聊天机器人仍然可以理解并用多种语言回复。",
+      "提示：语言选择只影响界面。聊天机器人仍可理解并用多种语言回复。",
     sendButtonIdle: "发送",
     sendButtonLoading: "发送中...",
     backendError:
-      "无法连接到服务器或后端没有响应。\n如果问题持续出现，请检查 Render 上的后端 URL。",
+      "无法连接服务器或后端无响应。\n若持续发生，请检查 Render 上的后端 URL。",
     regionAU: "Australia",
     regionSEA: "东南亚",
     regionEU: "Europe",
@@ -131,7 +123,6 @@ const STRINGS = {
 };
 
 /**
- * Build backend URL safely
  * Env should be BASE (no /chat), e.g. https://wellbeingagent.onrender.com
  */
 function buildBackendUrl() {
@@ -140,38 +131,33 @@ function buildBackendUrl() {
 
   let base = envBase && envBase.trim() ? envBase.trim() : fallbackBase;
 
-  // If someone accidentally set .../chat, strip it
+  // strip accidental /chat
   base = base.replace(/\/chat\/?$/i, "");
-  // Remove trailing slash
   base = base.replace(/\/$/, "");
 
   return `${base}/chat`;
 }
 
 /**
- * fetch with timeout using AbortController (Safari-safe)
+ * fetch with timeout (Safari safe)
  */
-async function fetchWithTimeout(url, options = {}, timeoutMs = 20000) {
+async function fetchWithTimeout(url, options = {}, timeoutMs = 25000) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
-
   try {
-    return await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
+    return await fetch(url, { ...options, signal: controller.signal });
   } finally {
     clearTimeout(id);
   }
 }
 
 /**
- * fetch with timeout + retry (for Safari / transient network)
+ * fetch with timeout + retry (retry on network/timeout only)
  */
 async function fetchWithTimeoutAndRetry(
   url,
   options = {},
-  { timeoutMs = 20000, retries = 1, retryDelayMs = 1200 } = {}
+  { timeoutMs = 25000, retries = 1, retryDelayMs = 1200 } = {}
 ) {
   let lastErr;
 
@@ -181,7 +167,6 @@ async function fetchWithTimeoutAndRetry(
     } catch (err) {
       lastErr = err;
 
-      // AbortError means timeout hit
       const isAbort =
         (err && err.name === "AbortError") ||
         String(err?.message || "").toLowerCase().includes("abort");
@@ -195,7 +180,6 @@ async function fetchWithTimeoutAndRetry(
 
       if (attempt < retries) {
         await new Promise((r) => setTimeout(r, retryDelayMs));
-        continue;
       }
     }
   }
@@ -204,14 +188,11 @@ async function fetchWithTimeoutAndRetry(
 }
 
 export default function Home() {
-  const [messages, setMessages] = useState([]); // [{role:'user'|'assistant', content:'...'}]
+  const [messages, setMessages] = useState([]); // [{role, content}]
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // UI language
   const [language, setLanguage] = useState("vi");
-
-  // Student Profile
   const [studentProfile, setStudentProfile] = useState({
     student_type: "domestic",
     student_region: "au",
@@ -224,9 +205,7 @@ export default function Home() {
   // eslint-disable-next-line no-console
   console.log("Backend URL (final):", backendURL);
 
-  const handleSuggestionClick = (text) => {
-    setInput(text);
-  };
+  const handleSuggestionClick = (text) => setInput(text);
 
   const sendMessage = async () => {
     if (!input.trim() || loading) return;
@@ -234,24 +213,19 @@ export default function Home() {
     const userMessage = input.trim();
     setInput("");
 
+    // Build nextMessages synchronously (avoid stale state)
+    const nextMessages = [...messages, { role: "user", content: userMessage }];
+
     // Optimistic UI update
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
+    setMessages(nextMessages);
     setLoading(true);
 
     try {
-      // Ensure history includes latest user message
-      const history = [...messages, { role: "user", content: userMessage }];
-
+      // ✅ Payload MUST match FastAPI ChatRequest schema (no extra fields)
       const payload = {
         student_id: "demo-user",
         message: userMessage,
-        history,
-        metadata: {
-          language,
-          student_type: studentProfile.student_type,
-          region: studentProfile.student_region,
-        },
-        // backward compatibility fields
+        history: nextMessages, // send full conversation so far
         profile_type: studentProfile.student_type,
         profile_region: studentProfile.student_region,
       };
@@ -264,25 +238,22 @@ export default function Home() {
           body: JSON.stringify(payload),
         },
         {
-          timeoutMs: 25000, // allow LLM latency
-          retries: 1, // retry once
+          timeoutMs: 30000, // LLM latency
+          retries: 1,
           retryDelayMs: 1500,
         }
       );
 
       if (!res.ok) {
         const text = await res.text().catch(() => "");
-        throw new Error(`Backend returned ${res.status} ${text}`);
+        throw new Error(`HTTP ${res.status} ${text}`.trim());
       }
 
       const data = await res.json().catch(() => ({}));
 
       setMessages((prev) => [
         ...prev,
-        {
-          role: "assistant",
-          content: data.reply || "(No reply)",
-        },
+        { role: "assistant", content: data.reply || "(No reply)" },
       ]);
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -314,7 +285,6 @@ export default function Home() {
   return (
     <div className="page-shell">
       <main className="page-container">
-        {/* Header */}
         <header className="page-header">
           <div className="page-title-row">
             <div>
@@ -337,11 +307,8 @@ export default function Home() {
           </div>
         </header>
 
-        {/* 2 columns */}
         <div className="page-grid">
-          {/* Left column */}
           <div className="page-column">
-            {/* Student profile */}
             <section className="section-card">
               <h2 className="section-title">{t.profileTitle}</h2>
 
@@ -392,7 +359,6 @@ export default function Home() {
               <p className="field-help">{t.profileHelp}</p>
             </section>
 
-            {/* Quick prompts */}
             <section className="section-card">
               <h2 className="section-title">{t.quickTitle}</h2>
               <p className="field-help">{t.quickHelp}</p>
@@ -412,7 +378,6 @@ export default function Home() {
             </section>
           </div>
 
-          {/* Right column: Chat */}
           <div className="page-column">
             <section className="section-card">
               <div className="chat-card-header">{t.shareHeader}</div>
@@ -435,7 +400,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Input + send */}
               <div className="chat-input-row">
                 <textarea
                   className="message-input"
@@ -460,7 +424,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Export buttons */}
         <div className="export-footer">
           <ExportButtons />
         </div>

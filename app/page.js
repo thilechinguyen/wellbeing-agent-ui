@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ExportButtons } from "../components/ExportButtons";
 
 /**
@@ -130,8 +130,27 @@ const STRINGS = {
   },
 };
 
+function buildBackendUrl() {
+  // ENV phải là base URL, ví dụ: https://wellbeingagent.onrender.com
+  const envBase = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  // Default base URL (KHÔNG kèm /chat)
+  const fallbackBase = "https://wellbeingagent.onrender.com";
+
+  // Chọn base
+  let base = (envBase && envBase.trim()) ? envBase.trim() : fallbackBase;
+
+  // Nếu ai đó lỡ set env có /chat, mình gỡ luôn để tránh /chat/chat
+  base = base.replace(/\/chat\/?$/i, "");
+
+  // normalize: bỏ dấu / cuối
+  base = base.replace(/\/$/, "");
+
+  return `${base}/chat`;
+}
+
 export default function Home() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]); // [{role:'user'|'assistant', content:'...'}]
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -144,39 +163,50 @@ export default function Home() {
     student_region: "au",
   });
 
-  // ✅ Chắc cú: luôn gọi đúng /chat
-  const rawBackend =
-    process.env.NEXT_PUBLIC_BACKEND_URL || "https://wellbeingagent.onrender.com/chat";
-  const backendURL = rawBackend.replace(/\/$/, "") + "/chat";
-
-  // Debug nhanh (mở console browser để nhìn)
-  // eslint-disable-next-line no-console
-  console.log("Backend URL UI is using:", backendURL);
-
+  const backendURL = useMemo(() => buildBackendUrl(), []);
   const currentSuggestions = SUGGESTIONS[language] || SUGGESTIONS.vi;
   const t = STRINGS[language] || STRINGS.vi;
+
+  // eslint-disable-next-line no-console
+  console.log("Backend URL (final):", backendURL);
 
   const handleSuggestionClick = (text) => {
     setInput(text);
   };
 
   const sendMessage = async () => {
+    // eslint-disable-next-line no-console
+    console.log("sendMessage() called");
+
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
     setInput("");
 
+    // Optimistic UI update
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
 
     try {
-      // Encode metadata đơn giản ở đầu message
-      const metaPrefix = `[lang=${language};profile_type=${studentProfile.student_type};profile_region=${studentProfile.student_region}] `;
+      // history gửi cho backend (nếu orchestrator cần)
+      const history = [...messages, { role: "user", content: userMessage }];
 
       const payload = {
         student_id: "demo-user",
-        message: metaPrefix + userMessage,
+        message: userMessage,
+        history,
+        metadata: {
+          language,
+          student_type: studentProfile.student_type,
+          region: studentProfile.student_region,
+        },
+        // vẫn gửi thêm dạng “cũ” để tương thích orchestrator nếu bạn dùng profile_type/profile_region
+        profile_type: studentProfile.student_type,
+        profile_region: studentProfile.student_region,
       };
+
+      // eslint-disable-next-line no-console
+      console.log("Payload:", payload);
 
       const res = await fetch(backendURL, {
         method: "POST",
@@ -185,12 +215,13 @@ export default function Home() {
       });
 
       if (!res.ok) {
+        const text = await res.text().catch(() => "");
         // eslint-disable-next-line no-console
-        console.error("Backend error status:", res.status);
-        throw new Error(`Backend returned ${res.status}`);
+        console.error("Backend error status:", res.status, text);
+        throw new Error(`Backend returned ${res.status} ${text}`);
       }
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
 
       setMessages((prev) => [
         ...prev,
@@ -207,7 +238,9 @@ export default function Home() {
         ...prev,
         {
           role: "assistant",
-          content: t.backendError,
+          content:
+            t.backendError +
+            `\n\n[Debug]\n${String(err?.message || err)}`,
         },
       ]);
     } finally {
@@ -272,9 +305,7 @@ export default function Home() {
                   }
                 >
                   <option value="domestic">{t.studentTypeDomestic}</option>
-                  <option value="international">
-                    {t.studentTypeInternational}
-                  </option>
+                  <option value="international">{t.studentTypeInternational}</option>
                 </select>
               </div>
 

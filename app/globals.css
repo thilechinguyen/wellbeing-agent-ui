@@ -350,3 +350,21 @@ button {
   color: #6b7280;
   margin-top: 0.3rem;
 }
+/* ===== FIX SAFARI CLICK BUG ===== */
+.chat-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.message-input {
+  flex: 1 1 auto;
+  min-width: 0; /* 🔥 DÒNG QUYẾT ĐỊNH */
+}
+
+.primary-button {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
+  pointer-events: auto;
+}
